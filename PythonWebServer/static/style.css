@@ -1,0 +1,119 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-width: 100vh;
+  margin: 0;
+  background-image: linear-gradient(to right, white, #f0ffff);
+  font-family: "Bitcount Grid Double", sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  color: black;
+}
+
+.put {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.switch {
+  height: 50px;
+  width: 50px;
+}
+
+input {
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: #f0ffff;
+  padding: 8px;
+}
+
+#terminal {
+  background-color: black;
+  height: 400px;
+  width: 80%;
+  margin-top: 30px;
+  color: #0f0;
+  font-size: 16.5px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-family: monospace; 
+}
+
+.operation {
+  font-size: 1.5rem;
+}
+
+button {
+  border-radius: 5px;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #f0ffff;
+}
+
+#cmd {
+  padding: 14px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  height: 25px;
+  width: 500px;
+}
+
+.command-box {
+  display: flex;
+  gap: 8px;
+}
+
+.footer {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+.footer-right {
+  display: flex;
+}
+
+.coordinator {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+}
+
+#rafa {
+  font-weight: bold;
+}
+
+.holder {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 5px;
+}
+
+.footer-img {
+  height: 10vh;
+}
