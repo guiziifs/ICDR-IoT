@@ -36,12 +36,16 @@
         <button id="disconnect">Desconectar</button>
       </div>
 
-      <pre id="terminal"></pre>
-
-      <div class="command-box">
-        <input id="cmd" type="text" placeholder="Insira o comando" />
-        <button id="send">Enviar</button>
+      <!-- NOVO TERMINAL -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <div class="terminal">
+        <div id="history"></div>
+        <div class="line">
+          <span id="path">c:/&nbsp;>&nbsp;</span>
+          <input type="text" id="input">
+        </div>
       </div>
+      <!-- FIM TERMINAL -->
     </div>
 
     <div class="footer">

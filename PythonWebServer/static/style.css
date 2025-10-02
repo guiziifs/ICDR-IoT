@@ -39,18 +39,6 @@ input {
   padding: 8px;
 }
 
-#terminal {
-  background-color: black;
-  height: 400px;
-  width: 80%;
-  margin-top: 30px;
-  color: #0f0;
-  font-size: 16.5px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  font-family: monospace; 
-}
-
 .operation {
   font-size: 1.5rem;
 }
@@ -69,11 +57,6 @@ button {
   margin-bottom: 20px;
   height: 25px;
   width: 500px;
-}
-
-.command-box {
-  display: flex;
-  gap: 8px;
 }
 
 .footer {
@@ -116,4 +99,41 @@ button {
 
 .footer-img {
   height: 10vh;
+}
+
+/* -------------------------
+   NOVO TERMINAL
+------------------------- */
+.terminal {
+  background: black;
+  color: #0f0;                /* verde neon estilo console */
+  font-family: monospace;
+  padding: 10px;
+  height: 400px;              /* igual ao terminal antigo */
+  width: 80%;
+  margin-top: 30px;
+  overflow-y: auto;           /* permite rolagem */
+  border-radius: 5px;
+}
+
+.line {
+  display: table;
+  width: 100%;
+}
+
+.terminal span {
+  display: table-cell;
+  width: 1px;
+  color: #0f0;
+}
+
+.terminal input {
+  display: table-cell;
+  width: 100%;
+  border: none;
+  background: black;
+  color: #0f0;
+  outline: none;
+  font-family: monospace;
+  font-size: 16px;
 }

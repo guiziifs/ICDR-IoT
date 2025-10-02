@@ -5,8 +5,8 @@
 #define TXD2 33         // 33 -> T1IN
 #define BAUD_U2 9600    // Cisco console
 
-const char* ssid     = "Lorenzo";
-const char* password = "12345678";
+const char* ssid     = "iPhone_de_Guilherme_(2)";
+const char* password = "pcguigui";
 
 WiFiServer server(23);   // Porta Telnet (23)
 WiFiClient client;

@@ -1,9 +1,6 @@
 let socket;
 
-const terminal = document.getElementById("terminal");
 const ipInput = document.getElementById("ip-input");
-const cmdInput = document.getElementById("cmd");
-const sendBtn = document.getElementById("send");
 
 document.getElementById("connect").onclick = () => {
   socket = io();
@@ -14,39 +11,62 @@ document.getElementById("connect").onclick = () => {
   });
 
   socket.on("server_response", (msg) => {
-    terminal.textContent += msg;   // escreve direto, sem quebrar linha
-    terminal.scrollTop = terminal.scrollHeight;
-    });
-
+    // escreve a resposta no histórico do terminal
+    $("#history").append(msg + "<br/>");
+    $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+  });
 };
 
-function sendCommand(){
-  const cmd = cmdInput.value;
+function sendCommand(cmd) {
+  if (!socket) return;
+  if (cmd.trim() === "") return;
   socket.emit("send_command", cmd);
-  cmdInput.value = "";
 }
 
-sendBtn.onclick = sendCommand;
-
-cmdInput.addEventListener("keypress", (event) =>{
-  if(event.key == "Enter"){
-    sendCommand();
-  }
-})
-
-//document.getElementById("send").onclick = () => {
-  //const cmd = document.getElementById("cmd").value;
-  //if (cmd.trim() !== "") {
-    //socket.emit("send_command", cmd);
-    //document.getElementById("cmd").value = "";
-  //}
-//};
-
+// desconectar
 document.getElementById("disconnect").onclick = () => {
-  socket.emit("disconnect_esp");
+  if (socket) socket.emit("disconnect_esp");
 };
 
 function log(msg) {
-  terminal.textContent += msg + "\n";
-  terminal.scrollTop = terminal.scrollHeight;
+  $("#history").append(msg + "<br/>");
+  $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
 }
+
+// --------------------
+// LÓGICA DO TERMINAL NOVO
+// --------------------
+$(function () {
+  $(".terminal").on("click", function () {
+    $("#input").focus();
+  });
+
+  $("#input").on("keydown", function search(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      const cmd = $(this).val();
+
+      if(cmd === "") {
+      $("#history").append("<br/>");  
+      } else {
+        // mostra o comando no histórico
+        $("#history").append("<span style='color:lightgreen'>" + $("#path").text() + cmd + "</span><br/>");
+        $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+      }
+
+      if (socket && socket.connected) {
+        // envia para o servidor
+        sendCommand(cmd);
+      } else {
+        $("#history").append("<span style='color:orange'>[Not connected]</span><br/>");
+      }
+
+      if (cmd.substring(0, 3) === "cd ") {
+        $("#path").html(cmd.substring(3) + "&nbsp;>&nbsp;");
+      }
+
+      // limpa input sempre
+      $(this).val("");
+    }
+  });
+});
