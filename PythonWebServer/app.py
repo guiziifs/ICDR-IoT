@@ -30,7 +30,7 @@ def connect_to_esp(data):
             while client_connected:
                 data = esp_socket.recv(1024)
                 if data:
-                    socketio.emit('server_response', data.decode(errors="ignore"))
+                    socketio.emit('server_response', data.decode('utf-8', errors="replace"))
         except Exception as e:
             socketio.emit('server_response', f"Connection error: {e}")
             client_connected = False
