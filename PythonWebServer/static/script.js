@@ -2,31 +2,86 @@ let socket;
 
 const ipInput = document.getElementById("ip-input");
 
+// ----------------
+// BOTÃO DE CONEXÃO 
+// ----------------
 document.getElementById("connect").onclick = () => {
-  socket = io();
+  // Se já existe uma conexão ativa, desconecta antes de criar outra
+  if (socket && socket.connected) {
+    console.log("[DEBUG] Já existe uma conexão ativa. Desconectando...");
+    socket.emit("disconnect_esp");
+    socket.disconnect();
+  }
+
+  // Cria nova conexão com o servidor
+  socket = io({ reconnection: false });
+
+  // Limpa ouvintes antigos
+  socket.off("connect");
+  socket.off("server_response");
+  socket.off("disconnect");
 
   socket.on("connect", () => {
-    log("Connected to Flask server");
     socket.emit("connect_to_esp", { ip: ipInput.value });
   });
 
   socket.on("server_response", (msg) => {
-    // escreve a resposta no histórico do terminal
-    $("#history").append(msg + "<br/>");
+    // Remove quebras de linha CR
+    msg = msg.replace(/\r/g, "").replace(/\x08/g, '');
+
+    // Atualiza a área do histórico
+    const history = $("#history");
+    history.append(msg);
     $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+
+    // Mantém o input no final do terminal
+    keepInputAtEnd();
   });
 };
 
-function sendCommand(cmd) {
-  if (!socket) return;
-  if (cmd.trim() === "") return;
-  socket.emit("send_command", cmd);
-}
-
-// desconectar
+// --------------------
+// BOTÃO DESCONECTAR
+// --------------------
 document.getElementById("disconnect").onclick = () => {
   if (socket) socket.emit("disconnect_esp");
 };
+
+// --------------------
+// TERMINAL INTERATIVO
+// --------------------
+$(function () {
+  $(".terminal").on("click", function () {
+    $("#input").focus();
+  });
+
+  $("#input").on("keydown", function (e) {
+    if (!socket || !socket.connected) return;
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cmd = $(this).val();
+
+      if (cmd) {
+        // envia o comando completo
+        sendCommand(cmd);
+        // mostra localmente o comando digitado
+        $("#history").append(cmd + "\r\n");
+      } else {
+        // envia apenas Enter (CR) quando input vazio
+        sendCommand("\r");
+      }
+
+      // limpa o input
+      $(this).val("");
+      keepInputAtEnd();
+    }
+  });
+});
+
+function sendCommand(cmd) {
+  if (!socket || !socket.connected) return;
+  socket.emit("send_command", cmd);
+}
 
 function log(msg) {
   $("#history").append(msg + "<br/>");
@@ -34,39 +89,13 @@ function log(msg) {
 }
 
 // --------------------
-// LÓGICA DO TERMINAL NOVO
+// Mantém o input na última linha do terminal
 // --------------------
-$(function () {
-  $(".terminal").on("click", function () {
-    $("#input").focus();
-  });
+function keepInputAtEnd() {
+  const terminal = $(".terminal");
+  const input = $("#input");
 
-  $("#input").on("keydown", function search(e) {
-    if (e.keyCode === 13) {
-      e.preventDefault();
-      const cmd = $(this).val();
-
-      if(cmd === "") {
-      $("#history").append("<br/>");  
-      } else {
-        // mostra o comando no histórico
-        $("#history").append("<span style='color:lightgreen'>" + $("#path").text() + cmd + "</span><br/>");
-        $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
-      }
-
-      if (socket && socket.connected) {
-        // envia para o servidor
-        sendCommand(cmd);
-      } else {
-        $("#history").append("<span style='color:orange'>[Not connected]</span><br/>");
-      }
-
-      if (cmd.substring(0, 3) === "cd ") {
-        $("#path").html(cmd.substring(3) + "&nbsp;>&nbsp;");
-      }
-
-      // limpa input sempre
-      $(this).val("");
-    }
-  });
-});
+  // Move o input sempre para o final do terminal
+  input.detach().appendTo(terminal);
+  input.focus();
+}

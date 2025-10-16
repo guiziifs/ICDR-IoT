@@ -1,26 +1,32 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
-#define RXD2 32         // R1OUT -> 32
-#define TXD2 33         // 33 -> T1IN
-#define BAUD_U2 9600    // Cisco console
+#define RXD2 32
+#define TXD2 33
+#define BAUD_PC 115200
+#define BAUD_U2 9600
 
 const char* ssid     = "iPhone_de_Guilherme_(2)";
 const char* password = "pcguigui";
 
-WiFiServer server(23);   // Porta Telnet (23)
+// =====================
+// Telnet/Wi-Fi (comentado por enquanto)
+// =====================
+WiFiServer server(23);
 WiFiClient client;
 
 void setup() {
   pinMode(RXD2, INPUT_PULLUP);
-  Serial.begin(115200);
+  Serial.begin(BAUD_PC);
   Serial2.begin(BAUD_U2, SERIAL_8N1, RXD2, TXD2);
 
-  Serial.println("\n== ESP32 <-> Cisco Bridge ==");
+  Serial.println("\n== ESP32 <-> Cisco Bridge (Serial apenas) ==");
 
-  // Conexão Wi-Fi
+  // =====================
+  // Conexão Wi-Fi (comentada)
+  // =====================
   WiFi.begin(ssid, password);
-  Serial.print("Conectando ao WiFi");
+  Serial.print("Conectando ao Wi-Fi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -32,29 +38,52 @@ void setup() {
   server.begin();
   server.setNoDelay(true);
 
-  // “Cutucão” inicial: envia alguns CR no console
-  for (int i = 0; i < 5; i++) { Serial2.write('\r'); delay(150); }
+  // "Cutucão" inicial para acordar o console Cisco
+  for (int i = 0; i < 6; i++) { Serial2.write('\r'); delay(120); }
 }
 
 void loop() {
-  // Aceita cliente novo
+  // =====================
+  // Telnet/Wi-Fi: Aceita cliente TCP (comentado)
+  // =====================
   if (server.hasClient()) {
-    if (client) client.stop();  // derruba cliente anterior
-    client = server.available();
-    Serial.println("Cliente conectado!");
+    WiFiClient newClient = server.available();
+    if (!client || !client.connected()) {
+      client = newClient;
+      Serial.println("Cliente Wi-Fi conectado!");
+      Serial2.flush();
+    } else {
+      newClient.stop();
+    }
   }
 
-  // Cisco -> Cliente TCP + Serial Monitor
+  // =====================
+  // Cisco -> Serial Monitor (VSCode)
+  // =====================
   while (Serial2.available()) {
     char c = Serial2.read();
+    // =====================
+    // Telnet/Wi-Fi: enviar para cliente TCP 
+    // =====================
     if (client && client.connected()) client.write(c);
-    Serial.write(c);   // ESPelha no monitor serial
+    Serial.write(c);  // Mostra no terminal local
   }
 
-  // Cliente TCP -> Cisco + Serial Monitor
+  // =====================
+  // Telnet/Wi-Fi: Cliente TCP -> Cisco
+  // =====================
+
   while (client && client.connected() && client.available()) {
     char c = client.read();
+    Serial2.write(c == '\n' ? '\r' : c);
+    Serial.write(c);  // Ecoa localmente
+  }
+
+  // =====================
+  // Serial Monitor (VSCode) -> Cisco
+  // =====================
+  while (Serial.available()) {
+    char c = Serial.read();
     Serial2.write(c == '\n' ? '\r' : c);  // converte LF → CR
-    Serial.write(c);                      // mostra no Serial também
   }
 }

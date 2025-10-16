@@ -104,36 +104,37 @@ button {
 /* -------------------------
    NOVO TERMINAL
 ------------------------- */
+/* Mantém o histórico e o input na mesma linha */
 .terminal {
-  background: black;
-  color: #0f0;                /* verde neon estilo console */
+  background-color: black;
+  color: white;
   font-family: monospace;
   padding: 10px;
-  height: 400px;              /* igual ao terminal antigo */
-  width: 80%;
+  height: 400px;
+  width: 80%;       
   margin-top: 30px;
-  overflow-y: auto;           /* permite rolagem */
+  overflow-y: auto;
   border-radius: 5px;
+
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  white-space: pre-wrap; /* mantém quebras de linha do conteúdo */
 }
 
-.line {
-  display: table;
-  width: 100%;
+#history {
+  display: inline;   
+  white-space: pre-wrap; 
 }
 
-.terminal span {
-  display: table-cell;
-  width: 1px;
-  color: #0f0;
-}
-
-.terminal input {
-  display: table-cell;
-  width: 100%;
+#input {
+  background: transparent;
   border: none;
-  background: black;
-  color: #0f0;
+  color: white;
   outline: none;
   font-family: monospace;
-  font-size: 16px;
+  font-size: 1em;
+  width: 100%;           /* cresce conforme o texto */
 }
